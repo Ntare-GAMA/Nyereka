@@ -1,0 +1,63 @@
+/* Futuristic Jarvis-Inspired UI with ShotDeck Elements */
+
+/* Global Styles */
+body {
+    background: radial-gradient(circle, #0a0a0a 20%, #111111 80%);
+    color: #00eaff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Container */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* Glassmorphism Panel */
+.panel {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 234, 255, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+/* Buttons */
+button {
+    background: linear-gradient(90deg, #00eaff, #007bff);
+    border: none;
+    padding: 12px 20px;
+    margin: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    box-shadow: 0 0 20px #00eaff;
+    transform: scale(1.05);
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .panel {
+        width: 95%;
+    }
+    button {
+        width: 100%;
+    }
+}
