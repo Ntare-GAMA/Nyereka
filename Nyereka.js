@@ -6,8 +6,8 @@ const backendURL = process.env.REACT_APP_BACKEND_URL; // Load backend URL from .
 function App() {
     const [userData, setUserData] = useState(null);
 
-    const login = () => {
-        window.location.href = `${backendURL}/login`;
+    const login = (platform) => {
+        window.location.href = `${backendURL}/login/${platform}`;
     };
 
     const fetchData = async () => {
@@ -19,9 +19,9 @@ function App() {
         }
     };
 
-    const deleteData = async () => {
+    const deleteData = async (platform) => {
         try {
-            const response = await axios.delete(`${backendURL}/delete-data`);
+            const response = await axios.delete(`${backendURL}/delete-data/${platform}`);
             alert(response.data.message || response.data.error);
         } catch (error) {
             console.error("Error deleting data", error);
@@ -31,9 +31,14 @@ function App() {
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
             <h1>Social Media Data Deletion App</h1>
-            <button onClick={login}>Login with Facebook</button>
+
+            <button onClick={() => login("facebook")}>Login with Facebook</button>
+            <button onClick={() => login("instagram")}>Login with Instagram</button>
+
             <button onClick={fetchData}>Fetch Data</button>
-            <button onClick={deleteData}>Delete My Data</button>
+
+            <button onClick={() => deleteData("facebook")}>Delete Facebook Data</button>
+            <button onClick={() => deleteData("instagram")}>Delete Instagram Data</button>
 
             {userData && (
                 <div>
