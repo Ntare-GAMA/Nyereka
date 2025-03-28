@@ -1,72 +1,161 @@
-import os
-import requests
-from flask import Flask, request, redirect, jsonify
-from dotenv import load_dotenv
-from flask_cors import CORS
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, CheckCircle, ShieldAlert } from 'lucide-react';
 
-load_dotenv()
+const NyerekaSecurityChecker = () => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [securityResults, setSecurityResults] = useState(null);
+  const [error, setError] = useState(null);
 
-app = Flask(__name__)
-CORS(app)
+  // Simulated Security Check Function
+  const checkNyerekaSecurity = async (email) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Simulated security check results
+        const securityIssues = [
+          {
+            type: 'UnverifiedDevice',
+            description: 'Unrecognized device detected on your account',
+            severity: 'medium'
+          },
+          {
+            type: 'RecentUnusualActivity',
+            description: 'Suspicious login from an unexpected location',
+            severity: 'high'
+          }
+        ];
 
-FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
-FB_CLIENT_SECRET = os.getenv("FB_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("BACKEND_URL") + "/callback"
+        // Randomize results for demonstration
+        const hasIssues = Math.random() > 0.5;
 
-user_tokens = {}
+        resolve({
+          email,
+          hasSecurityIssues: hasIssues,
+          issues: hasIssues ? securityIssues : [],
+          recommendedActions: [
+            'Update your account password',
+            'Enable two-factor authentication',
+            'Review recent account activity'
+          ]
+        });
+      }, 1500);
+    });
+  };
 
-@app.route("/login")
-def login():
-    auth_url = (
-        f"https://www.facebook.com/v18.0/dialog/oauth?"
-        f"client_id={FB_CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=email,public_profile,user_posts"
-    )
-    return redirect(auth_url)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
 
-@app.route("/callback")
-def callback():
-    code = request.args.get("code")
-    if not code:
-        return "Authorization failed", 400
+    setLoading(true);
+    setError(null);
+    setSecurityResults(null);
 
-    token_url = (
-        f"https://graph.facebook.com/v18.0/oauth/access_token?"
-        f"client_id={FB_CLIENT_ID}&redirect_uri={REDIRECT_URI}&client_secret={FB_CLIENT_SECRET}&code={code}"
-    )
+    try {
+      const results = await checkNyerekaSecurity(email);
+      setSecurityResults(results);
+    } catch (err) {
+      setError('Failed to check security. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    response = requests.get(token_url)
-    data = response.json()
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <ShieldAlert className="mr-2" /> Nyereka Security Checker
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input 
+              type="email" 
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full"
+            />
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={loading}
+            >
+              {loading ? 'Checking Security...' : 'Check Security'}
+            </Button>
 
-    if "access_token" not in data:
-        return jsonify({"error": "Failed to get access token"}), 400
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-    access_token = data["access_token"]
-    user_tokens["user"] = access_token
+            {loading && (
+              <div className="text-center text-gray-500">
+                Analyzing your account security...
+              </div>
+            )}
 
-    return jsonify({"message": "Logged in successfully!", "access_token": access_token})
+            {securityResults && !loading && (
+              <div>
+                {securityResults.hasSecurityIssues ? (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Security Concerns Detected!</AlertTitle>
+                    <AlertDescription>
+                      Potential security issues found for {securityResults.email}
+                      <ul className="mt-2 list-disc pl-5">
+                        {securityResults.issues.map((issue, index) => (
+                          <li key={index} className="mb-1">
+                            <strong>{issue.type}</strong>: {issue.description}
+                            <span className="ml-2 text-sm text-red-600">
+                              (Severity: {issue.severity})
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-3">
+                        <strong>Recommended Actions:</strong>
+                        <ul className="list-disc pl-5">
+                          {securityResults.recommendedActions.map((action, index) => (
+                            <li key={index}>{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert variant="default">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <AlertTitle>No Major Security Issues</AlertTitle>
+                    <AlertDescription>
+                      Your account appears to be secure. 
+                      Continue to follow best practices for online safety.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
-@app.route("/fetch-data", methods=["GET"])
-def fetch_data():
-    token = user_tokens.get("user")
-    if not token:
-        return jsonify({"error": "User not authenticated"}), 401
-
-    url = f"https://graph.facebook.com/v18.0/me?fields=id,name,email&access_token={token}"
-    response = requests.get(url)
-    return jsonify(response.json())
-
-@app.route("/delete-data", methods=["DELETE"])
-def delete_data():
-    token = user_tokens.get("user")
-    if not token:
-        return jsonify({"error": "User not authenticated"}), 401
-
-    delete_url = f"https://graph.facebook.com/v18.0/me/permissions?access_token={token}"
-    response = requests.delete(delete_url)
-
-    if response.status_code == 200:
-        return jsonify({"message": "User data deleted successfully!"})
-    return jsonify({"error": "Failed to delete data", "details": response.json()}), 400
-
-if __name__ == "__main__":
-    app.run(debug=True)
+export default NyerekaSecurityChecker;
