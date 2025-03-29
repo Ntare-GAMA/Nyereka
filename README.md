@@ -11,14 +11,14 @@ A security-checking web app that allows users to analyze their account security 
 ```
 /nyereka-security-checker
 │── /public
-│   ├── background.mp4  # Background video
+│   ├── Zenitsu.mp4  # Background video
 │── /backend
 │   ├── server.js       # API Proxy Server (Node.js)
 │   ├── .env            # API Keys (DO NOT SHARE)
 │── /frontend
 │   ├── index.html      # Main HTML
-│   ├── styles.css      # Styling
-│   ├── script.js       # API Call Logic
+│   ├── Nyereka.css      # Styling
+│   ├── Nyereka.js       # API Call Logic
 │── .gitignore
 │── README.md
 │── package.json
@@ -93,7 +93,7 @@ Save this as `index.html`:
 
 ---
 
-### **CSS - Save as `styles.css`**
+### **CSS - Save as `Nyereka.css`**
 ```css
 * {
     margin: 0;
@@ -224,3 +224,5 @@ app.listen(5000, () => console.log('Server running on port 5000'));
 
 ## **📜 License**
 This project is open-source under the MIT License.
+
+The following is a link to its tutorial, https://drive.google.com/file/d/1MHROWUrFpk143Q6nFxvBcd0x58jaPTQe/view?usp=drive_link
